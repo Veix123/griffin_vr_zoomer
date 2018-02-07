@@ -32,5 +32,7 @@ private:
   ros::ServiceClient unload_plugin_client_;
   ros::ServiceClient set_plugin_config_client_;
   ros::ServiceClient get_plugin_config_client_;
+
+  long plugin_id_;
 };
 #endif
