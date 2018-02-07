@@ -12,7 +12,7 @@
 class GriffinVRZoomer
 {
 public:
-  GriffinVRZoomer();
+  GriffinVRZoomer(std::string rviz_ns, std::string griffin_ns);
   ~GriffinVRZoomer();
 
 private:
@@ -20,8 +20,9 @@ private:
   void waitForRvizPluginManager();
   void griffinCallback(const griffin_powermate::PowermateEvent& msg);
 
-
-  ros::NodeHandle nh_;
+// nodehandles in rviz and griffin powermate namespaces
+  ros::NodeHandle rviz_nh_;
+  ros::NodeHandle griffin_nh_;
 
   // griffin event subscriber
   ros::Subscriber sub_;

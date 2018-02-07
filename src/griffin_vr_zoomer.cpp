@@ -7,29 +7,27 @@
 
 #include <iostream>
 
-
-GriffinVRZoomer::GriffinVRZoomer()
+GriffinVRZoomer::GriffinVRZoomer(std::string rviz_ns, std::string griffin_ns)
+  : rviz_nh_(rviz_ns), griffin_nh_(griffin_ns)
 {
-  nh_ = ros::NodeHandle("~");
-
+  // subscribe to griffin events
+  std::string topic = "events";
+  griffin_nh_.getParam("griffin_topic", topic);
+  sub_ = griffin_nh_.subscribe(topic, 100, &GriffinVRZoomer::griffinCallback, this);
+  ROS_INFO_STREAM("Listening on topic: '" << topic<<"'");
   // Load rviz_plugin_manager service clients
-  load_plugin_client_ = nh_.serviceClient<rviz_plugin_manager::PluginLoad>("rviz_plugin_load");
+  load_plugin_client_ = rviz_nh_.serviceClient<rviz_plugin_manager::PluginLoad>("rviz_plugin_load");
   unload_plugin_client_ =
-      nh_.serviceClient<rviz_plugin_manager::PluginUnload>("rviz_plugin_unload");
+      rviz_nh_.serviceClient<rviz_plugin_manager::PluginUnload>("rviz_plugin_unload");
   get_plugin_config_client_ =
-      nh_.serviceClient<rviz_plugin_manager::PluginGetConfig>("rviz_plugin_get_"
+      rviz_nh_.serviceClient<rviz_plugin_manager::PluginGetConfig>("rviz_plugin_get_"
                                                               "config");
   set_plugin_config_client_ =
-      nh_.serviceClient<rviz_plugin_manager::PluginSetConfig>("rviz_plugin_set_"
+      rviz_nh_.serviceClient<rviz_plugin_manager::PluginSetConfig>("rviz_plugin_set_"
                                                               "config");
 
   waitForRvizPluginManager();
 
-  // subscribe to griffin events
-  std::string topic = "/griffin_powermate/events";
-  nh_.getParam("powermate_topic", topic);
-  sub_ = nh_.subscribe(topic, 100, &GriffinVRZoomer::griffinCallback, this);
-  ROS_INFO_STREAM("Listening on topic: '" << topic<<"'");
 }
 
 GriffinVRZoomer::~GriffinVRZoomer()
@@ -70,14 +68,19 @@ void GriffinVRZoomer::griffinCallback(const griffin_powermate::PowermateEvent& m
 
 int main(int argc, char* argv[])
 {
-  ROS_INFO_STREAM("Zoomer main");
-
   // ROS init
   ros::init(argc, argv, "griffin_vr_zoomer");
 
+  // get rviz and griffin namespaces
+  std::string rviz_ns = "/rviz";
+  std::string griffin_ns = "/griffin_powermate";
+  ros::NodeHandle nh("~");
+  nh.getParam("rviz_ns", rviz_ns);
+  nh.getParam("griffin_ns", griffin_ns);
+
   try
   {
-    GriffinVRZoomer zoomer;
+    GriffinVRZoomer zoomer(rviz_ns, griffin_ns);
     ros::spin();
   }
   catch(std::exception& e)
