@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<launch>
+
+  <node name="griffin_powermate" pkg="griffin_powermate" type="griffin_powermate" output="screen"/>
+
+  <node name="griffin_vr_zoomer" pkg="griffin_vr_zoomer" type="griffin_vr_zoomer" output="screen">
+    <param name="powermate_topic" value="/griffin_powermate/events"/>
+  </node>
+
+</launch>
