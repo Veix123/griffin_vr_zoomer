@@ -31,10 +31,7 @@ GriffinVRZoomer::GriffinVRZoomer(std::string rviz_ns, std::string griffin_ns)
   rviz_plugin_manager::PluginLoad load_msg;
   load_msg.request.plugin_class = "OSVR Plugin for RViz";
   load_msg.request.plugin_name = "OSVR Plugin";
-  load_msg.request.plugin_config = "{Follow RViz camera: false, Fullscreen: false, OSVR tf frame: spacenav, Offset: {X: -0.6, Y: 0.0, Z: 0.3}, Screen name: HDMI-1}";
-//      OSVR tf frame: /rviz_plugin_osvr/head\nOffset:\n  X: -0.600000024\n\
-//                                        \  Y: 0\n  Z: 0.300000012\nPublish tf: false\nScale:\n  X: 1\n  Y: 1\n  Z: 1\nScreen\
-//                                          \ name: DP-3\nTarget frame: spacenav\nUse tracker: false\nValue: true\n";
+  load_msg.request.plugin_config = "{Follow RViz camera: false, Fullscreen: true, Target frame: spacenav, Offset: {X: -0.6, Y: 0.0, Z: 0.3}, Screen name: HDMI-1, Publish tf: false, Use tracker: false}";
   if(load_plugin_client_.call(load_msg) && load_msg.response.code == 0)
   {
     plugin_id_ = load_msg.response.plugin_uid;
@@ -74,10 +71,11 @@ void GriffinVRZoomer::griffinCallback(const griffin_powermate::PowermateEvent& m
 
   //build the config str;
   double sensitivity_x = 0.01;
-  double sensitivity_z = -0.04;
+  double sensitivity_z = -0.005;
+  long integral = msg.integral - 60;
   std::stringstream conf;
-  conf << "Offset: {X: " << msg.integral*sensitivity_x-0.6;
-  conf << ", Y: 0, Z: " << msg.integral*sensitivity_z+0.2;
+  conf << "Offset: {X: " << integral*sensitivity_x;
+  conf << ", Y: 0, Z: " << integral*sensitivity_z;
   conf << "}";
 
   rviz_plugin_manager::PluginSetConfig set_cfg_msg;
